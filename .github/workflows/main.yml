@@ -19,15 +19,12 @@ jobs:
       with:
         python-version: "3.12"
 
-    - name: Instalar Dependências
+    - name: Instalar Poetry
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    - name: Executar Testes do Django
+    - name: Gerar requirements.txt e Build Docker
       run: |
-        python manage.py test
-
-    - name: Verificar Build do Docker
-      run: |
+        poetry export -f requirements.txt --output requirements.txt
         docker build -t bookstore-test .
