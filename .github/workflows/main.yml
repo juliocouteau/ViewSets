@@ -11,20 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Baixar código do repositório
+    - name: 1. Baixar código do repositório
       uses: actions/checkout@v3
 
-    - name: Configurar Python 3.12
+    - name: 2. Configurar Python
       uses: actions/setup-python@v4
       with:
         python-version: "3.12"
 
-    - name: Instalar Poetry
+    - name: 3. Instalar Poetry e Plugin de Exportação
       run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        pip install poetry poetry-plugin-export
 
-    - name: Gerar requirements.txt e Build Docker
+    - name: 4. Gerar requirements.txt para o Docker
       run: |
         poetry export -f requirements.txt --output requirements.txt
+
+    - name: 5. Build da Imagem Docker
+      run: |
         docker build -t bookstore-test .
