@@ -24,7 +24,7 @@ jobs:
 
       - name: 4. Sincronizar e Gerar requirements.txt
         run: |
-          poetry lock --no-update
+          poetry lock
           poetry export -f requirements.txt --output requirements.txt --without-hashes
 
       - name: 5. Build da Imagem Docker
