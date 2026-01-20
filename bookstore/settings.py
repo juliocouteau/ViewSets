@@ -25,12 +25,13 @@ INSTALLED_APPS = [
     # Frameworks de terceiros
     'rest_framework',
     'rest_framework.authtoken', 
-    # Seus Apps
     'product',
 ]
 
 MIDDLEWARE = [
+    
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,3 +108,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+import dj_database_url
+import os
+
+
+db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
+if db_from_env:
+    DATABASES['default'].update(db_from_env)
