@@ -9,6 +9,8 @@ services:
       - POSTGRES_DB=bookstore_db
       - POSTGRES_USER=usuario
       - POSTGRES_PASSWORD=senha_forte
+    networks:
+      - bookstore_network
 
   web:
     build: .
@@ -25,6 +27,12 @@ services:
       - DB_PORT=5432
     depends_on:
       - db
+    networks:
+      - bookstore_network
+
+networks:
+  bookstore_network:
+    driver: bridge
 
 volumes:
   postgres_data:
