@@ -1,4 +1,4 @@
-name: Django CI
+name: Deploy no Heroku
 
 on:
   push:
@@ -7,26 +7,35 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: 1. Baixar código do repositório
-      uses: actions/checkout@v3
+      - name: 1. Baixar código
+        uses: actions/checkout@v3
 
-    - name: 2. Configurar Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.12"
+      - name: 2. Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-    - name: 3. Instalar Poetry e Plugin de Exportação
-      run: |
-        pip install poetry poetry-plugin-export
+      - name: 3. Instalar Poetry e Plugin de Exportação
+        run: |
+          pip install poetry poetry-plugin-export
 
-    - name: 4. Gerar requirements.txt para o Docker
-      run: |
-        poetry export -f requirements.txt --output requirements.txt
+      - name: 4. Sincronizar e Gerar requirements.txt
+        run: |
+          poetry lock --no-update
+          poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-    - name: 5. Build da Imagem Docker
-      run: |
-        docker build -t bookstore-test .
+      - name: 5. Build da Imagem Docker
+        run: |
+          docker build -t bookstore-test .
+
+      - name: 6. Deploy no Heroku
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: "SEU_EMAIL_DO_HEROKU_AQUI"
+          usedocker: true
