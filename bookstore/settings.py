@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -9,7 +10,8 @@ SECRET_KEY = 'django-insecure-8lkgz3*)%3nm7dj!4^osj-@ee)x-&*oc(7_hvq1!7-b9jcf7(e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALTERADO: Permitir que o Docker acesse o host
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -22,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Frameworks de terceiros
     'rest_framework',
-    'rest_framework.authtoken', # Adicionado para Autenticação
+    'rest_framework.authtoken', 
     # Seus Apps
     'product',
 ]
@@ -57,11 +59,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bookstore.wsgi.application'
 
 
-# Database
+# ==============================================================
+# CONFIGURAÇÃO DE BANCO DE DADOS (POSTGRESQL PARA DOCKER)
+# ==============================================================
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'bookstore_db'),
+        'USER': os.environ.get('DB_USER', 'usuario'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'senha_forte'),
+        'HOST': os.environ.get('DB_HOST', 'db'), # 'db' deve ser o nome do serviço no docker-compose
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -89,14 +97,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==============================================================
-# CONFIGURAÇÕES DO DJANGO REST FRAMEWORK (PAGINAÇÃO E TOKEN)
+# CONFIGURAÇÕES DO DJANGO REST FRAMEWORK
 # ==============================================================
 REST_FRAMEWORK = {
-    # Configuração de Paginação (Exercício Anterior)
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 
-    # Configuração de Autenticação (Exercício Atual)
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
